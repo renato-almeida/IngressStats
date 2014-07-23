@@ -6,8 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map.Entry;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.renatoalmeida.parserstuff.ProgressParser;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class ShareActivity extends Activity {
 
@@ -44,9 +47,9 @@ public class ShareActivity extends Activity {
 		    if (imageUri != null) {
 		    	Bitmap image = getImage(imageUri);
 		        
-		        ImageView i = (ImageView)findViewById(R.id.picture);
+		        //ImageView i = (ImageView)findViewById(R.id.picture);
 		        
-		        i.setImageBitmap(image);
+		        //i.setImageBitmap(image);
 		        
 		        TessBaseAPI baseApi = new TessBaseAPI();
 				baseApi.setDebug(true);
@@ -59,6 +62,13 @@ public class ShareActivity extends Activity {
 				
 				Log.v(TAG, recognizedText);
 				
+				ProgressParser pp = new ProgressParser(recognizedText);
+				
+				TextView tv = (TextView) findViewById(R.id.texto);
+				
+				for(Entry<String, Integer> item : pp.statValue.entrySet()){
+					tv.setText(tv.getText() + item.getKey() + " : " + item.getValue()+"\n");
+				}
 				
 		        
 		    }else{
