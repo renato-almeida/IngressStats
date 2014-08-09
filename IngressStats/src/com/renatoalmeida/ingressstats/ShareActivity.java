@@ -6,12 +6,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
+import java.util.Map.Entry;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.renatoalmeida.db.StatsContract.StatsEntry;
+import com.renatoalmeida.db.StatsReaderDbHelper;
+import com.renatoalmeida.parserstuff.ProgressParser;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -22,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class ShareActivity extends Activity {
 
@@ -44,9 +52,9 @@ public class ShareActivity extends Activity {
 		    if (imageUri != null) {
 		    	Bitmap image = getImage(imageUri);
 		        
-		        ImageView i = (ImageView)findViewById(R.id.picture);
+		        //ImageView i = (ImageView)findViewById(R.id.picture);
 		        
-		        i.setImageBitmap(image);
+		        //i.setImageBitmap(image);
 		        
 		        TessBaseAPI baseApi = new TessBaseAPI();
 				baseApi.setDebug(true);
@@ -59,7 +67,24 @@ public class ShareActivity extends Activity {
 				
 				Log.v(TAG, recognizedText);
 				
+				ProgressParser pp = new ProgressParser(recognizedText);
 				
+				TextView tv = (TextView) findViewById(R.id.texto);
+				
+				StatsReaderDbHelper mDbHelper = new StatsReaderDbHelper(this.getApplicationContext());
+				SQLiteDatabase db = mDbHelper.getWritableDatabase();
+				ContentValues values = new ContentValues();
+				
+				values.put(StatsEntry.COLUMN_NAME_STATS_ID, System.currentTimeMillis() / 1000L);
+				
+				for(Entry<String, Integer> item : pp.statValue.entrySet()){
+					tv.setText(tv.getText() + item.getKey() + " : " + item.getValue()+"\n");
+					
+					values.put(item.getKey(), item.getValue());
+				}
+				
+				long newRowId;
+				newRowId = db.insert(StatsEntry.TABLE_NAME, null, values);
 		        
 		    }else{
 				 Log.d("cenas", "nullllll");
