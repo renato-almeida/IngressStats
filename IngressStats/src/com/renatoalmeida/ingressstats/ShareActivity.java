@@ -96,10 +96,8 @@ public class ShareActivity extends Activity {
 	   try {
 		return  MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
 	} catch (FileNotFoundException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	   return null;
@@ -112,7 +110,7 @@ public class ShareActivity extends Activity {
 			File dir = new File(path);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
-					Log.v(TAG, "ERROR: Creation of directory " + path + " on sdcard failed");
+					Log.e(TAG, "ERROR: Creation of directory " + path + " on sdcard failed");
 					return;
 				} else {
 					Log.v(TAG, "Created directory " + path + " on sdcard");
