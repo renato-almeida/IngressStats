@@ -15,13 +15,16 @@ public class ProgressParser {
 		statValue = new HashMap<String, Integer>();
 		
 		for(String line : text.split("\\r?\\n")){
+			Log.d("cenas", line);
 			for(String stat : StatsResources.statsString.keySet()){
-				Log.d("cenas", line + " "+stat);
-				if(line.startsWith(StatsResources.statsString.get(stat))){
+				
+				String tmpLine = line.replace(" ", "");
+				String tmpStat = StatsResources.statsString.get(stat).replace(" ", "");
+				
+				if(tmpLine.startsWith(tmpStat)){
 					statValue.put(stat, Integer.parseInt(line.replaceAll("[^\\d.]", "")));
 				}
 			}
 		}
-		
 	}
 }
