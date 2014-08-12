@@ -31,6 +31,10 @@ public class MainActivity extends Activity {
 		Cursor c = db.getLastEntry();
 		c.moveToFirst();
 		
+		if(c.getCount() == 0)
+			return;
+		
+		
 		List<String> statWithBadge = new ArrayList<String>();
 		
 		for(int i=0; i<StatsResources.stats.size(); i++ ){
