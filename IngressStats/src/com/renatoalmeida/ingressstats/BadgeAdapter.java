@@ -34,7 +34,7 @@ public class BadgeAdapter extends ArrayAdapter<String>{
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        Log.d("cenas", "cenas "+position);
+        
         if(row == null)
         {
             LayoutInflater inflater = ((Activity)this.getContext()).getLayoutInflater();
