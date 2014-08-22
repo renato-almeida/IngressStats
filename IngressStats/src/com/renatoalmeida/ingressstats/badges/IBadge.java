@@ -24,7 +24,7 @@ public abstract class IBadge {
 	public BadgeRequirement getNextBadgeRequirement(BadgeRequirement current){
 		int pos = getRequirements().indexOf(current);
 		
-		if(pos >= getRequirements().size()-1)
+		if(current != null && pos >= getRequirements().size()-1 )
 			return null;
 		else
 			return getRequirements().get(pos+1);

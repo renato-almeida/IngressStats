@@ -11,9 +11,6 @@ public final class StatsContract {
     public static abstract class StatsEntry implements BaseColumns {
         public static final String TABLE_NAME = "IngressStats";
         public static final String COLUMN_NAME_STATS_ID = "StatsID"; //This will be the timestamp
-        
-
-        public static final String COLUMN_NAME_AP = "AP";
 
         //check the rest on StatsResources.statsOrder
         

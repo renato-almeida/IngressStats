@@ -29,8 +29,6 @@ public class BadgeAdapter extends ArrayAdapter<String>{
 		this.values = values;
 	}
 	
-	
-	
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
@@ -54,10 +52,11 @@ public class BadgeAdapter extends ArrayAdapter<String>{
         badgeObject = BadgeList.List.get(stat);
         br = badgeObject.getBadge(badgeValue);
         nextBR = badgeObject.getNextBadgeRequirement(br);
-        
-        badge.setImageResource(br.getImageResource());
-        value.setText(badgeValue+"");
-        
+       
+        if(br != null){ //Locked badge
+	        badge.setImageResource(br.getImageResource());
+	        value.setText(badgeValue+"");
+        }
         if(nextBR != null){
         	String x = String.format("%d / %d \n %.1f%%", badgeValue, nextBR.getValue(), 1.0*badgeValue/nextBR.getValue()*100);
         	value.setText(x);

@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
@@ -47,48 +48,9 @@ public class MainActivity extends Activity {
 		BadgeAdapter ba = new BadgeAdapter(this, statWithBadge, c);
 		lv.setAdapter(ba);
 		
-		
-		
-		/*String[] columns = new String[] {
-		    //StatsEntry.COLUMN_NAME_STATS_ID,
-		    "Hacks"
-		};
-			 
-			  // the XML defined views which the data will be bound to
-		  int[] to = new int[] { 
-		    android.R.id.text1,
-		  };
-		
-		SimpleCursorAdapter dataAdapter = new SimpleCursorAdapter(
-			    this, android.R.layout.simple_list_item_1, 
-			    db.getLastEntry(),
-			    columns, 
-			    to,
-			    0);
-		
-		lv.setAdapter(dataAdapter);
-		
-		
-		Cursor c = db.getLastEntry();
-		c.moveToFirst();
-		
-
-		Log.d("cenas", "  "+BadgeList.List.size());
-		
-		for(int i=0; i<StatsResources.stats.size(); i++ ){
-			String stat = StatsResources.stats.get(i);
-			
-			long value = c.getLong(c.getColumnIndex(stat));
-			BadgeRequirement b;
-			IBadge badge;
-			
-			if((badge = BadgeList.List.get(stat)) != null){
-				Log.d("cenas", stat + " : " + badge.getBadge(value).getBadgeLevel().name());
-			}else{
-				Log.d("cenas", stat + " : -----------");
-			}
-			
-		}*/
+		TextView tv = (TextView) findViewById(R.id.ap);
+		Log.d("cenas", "pos: "+c.getColumnIndex("AP"));
+		tv.setText("AP :" + c.getLong(c.getColumnIndex("AP")));
 		
 	}
 }
