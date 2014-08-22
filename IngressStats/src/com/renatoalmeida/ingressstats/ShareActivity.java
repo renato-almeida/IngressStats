@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -15,6 +16,7 @@ import com.renatoalmeida.db.StatsReaderDbHelper;
 import com.renatoalmeida.parserstuff.ProgressParser;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -22,12 +24,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,53 +49,17 @@ public class ShareActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_share);
 		
-		setOCRStuff();
+		(new StatsParserTask()).execute(getIntent());	
 		
-		Intent intent = getIntent();
-
-	    if (intent.getType().indexOf("image/") != -1) {
-	    	Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-		    if (imageUri != null) {
-		    	Bitmap image = getImage(imageUri);
-		        
-		        //ImageView i = (ImageView)findViewById(R.id.picture);
-		        
-		        //i.setImageBitmap(image);
-		        
-		        TessBaseAPI baseApi = new TessBaseAPI();
-				baseApi.setDebug(true);
-				baseApi.init(DATA_PATH, lang);
-				baseApi.setImage(image);
-
-				String recognizedText = baseApi.getUTF8Text();
-
-				baseApi.end();
-				
-				Log.v(TAG, recognizedText);
-				
-				ProgressParser pp = new ProgressParser(recognizedText);
-				
-				TextView tv = (TextView) findViewById(R.id.texto);
-				
-				StatsReaderDbHelper mDbHelper = new StatsReaderDbHelper(this.getApplicationContext());
-				SQLiteDatabase db = mDbHelper.getWritableDatabase();
-				ContentValues values = new ContentValues();
-				
-				values.put(StatsEntry.COLUMN_NAME_STATS_ID, System.currentTimeMillis() / 1000L);
-				
-				for(Entry<String, Integer> item : pp.statValue.entrySet()){
-					tv.setText(tv.getText() + item.getKey() + " : " + item.getValue()+"\n");
-					
-					values.put(item.getKey(), item.getValue());
-				}
-				
-				long newRowId;
-				newRowId = db.insert(StatsEntry.TABLE_NAME, null, values);
-		        
-		    }else{
-				 Log.d("cenas", "nullllll");
-		    }
-	    }
+		Button b = (Button) findViewById(R.id.ok);
+		b.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				startActivity(i);
+				finish();
+			}
+		});
 	}
 	
 	private Bitmap getImage(Uri uri){
@@ -144,4 +114,87 @@ public class ShareActivity extends Activity {
 			}
 		}
 	}
+
+	private class StatsParserTask extends AsyncTask<Intent, String, HashMap<String, Integer>> {
+		ProgressDialog progDailog;
+		
+		@Override
+	     protected HashMap<String, Integer> doInBackground(Intent... intents) {
+            publishProgress("Starting...");
+            ShareActivity.this.setOCRStuff();
+             
+            HashMap<String, Integer> ret = null;
+            
+            Intent intent = getIntent();
+            publishProgress("Getting the imagem...");
+    	    if (intent.getType().indexOf("image/") != -1) {
+    	    	Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+    		    if (imageUri != null) {
+    		    	Bitmap image = getImage(imageUri);
+    		        
+    				publishProgress("Parsing ...");
+    		    	
+    		        TessBaseAPI baseApi = new TessBaseAPI();
+    				baseApi.setDebug(true);
+    				baseApi.init(DATA_PATH, lang);
+    				baseApi.setImage(image);
+
+    				String recognizedText = baseApi.getUTF8Text();
+
+    				baseApi.end();
+    				
+    				Log.v(TAG, recognizedText);
+    				
+    				publishProgress("Parse done, starting text parse ...");
+    				
+    				ProgressParser pp = new ProgressParser(recognizedText);
+    				
+    				publishProgress("Storing values in database...");
+    				
+    				StatsReaderDbHelper mDbHelper = new StatsReaderDbHelper(ShareActivity.this);
+    				SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    				ContentValues values = new ContentValues();
+    				
+    				values.put(StatsEntry.COLUMN_NAME_STATS_ID, System.currentTimeMillis() / 1000L);
+    				
+    				for(Entry<String, Integer> item : pp.statValue.entrySet()){
+    					values.put(item.getKey(), item.getValue());
+    				}
+    				
+    				db.insert(StatsEntry.TABLE_NAME, null, values);
+    		        
+    				publishProgress("All went well...");
+    				ret = pp.statValue;
+    		    }else{
+    				 Log.d("cenas", "nullllll");
+    		    }
+    	    }
+            
+			return ret;
+	     }
+	     
+		@Override
+	     protected void onPreExecute() {
+            progDailog = new ProgressDialog(ShareActivity.this);
+            progDailog.setMessage("Loading...");
+            progDailog.setIndeterminate(true);
+            progDailog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progDailog.setCancelable(false);
+            progDailog.show();
+	     }
+	     
+		@Override
+	     protected void onProgressUpdate(String... progress) {
+	    	 progDailog.setMessage(progress[0]);
+	     }
+
+		@Override
+	     protected void onPostExecute(HashMap<String, Integer> result) {
+	    	 progDailog.dismiss();
+	    	 TextView tv = (TextView) findViewById(R.id.texto);
+	    	 for(Entry<String, Integer> item : result.entrySet()){
+					tv.setText(tv.getText() + item.getKey() + " : " + item.getValue()+"\n");
+	    	 }
+	     }
+	 }
 }
