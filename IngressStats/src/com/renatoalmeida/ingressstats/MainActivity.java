@@ -9,8 +9,10 @@ import com.renatoalmeida.db.StatsResources;
 import com.renatoalmeida.ingressstats.badges.BadgeList;
 import com.renatoalmeida.ingressstats.badges.BadgeRequirement;
 import com.renatoalmeida.ingressstats.badges.IBadge;
+import com.renatoalmeida.ingressstats.shareactivity.ShareActivity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;

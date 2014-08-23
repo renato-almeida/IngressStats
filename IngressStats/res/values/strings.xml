@@ -4,4 +4,14 @@
     <string name="app_name">IngressStats</string>
     <string name="hello_world">Hello world!</string>
 
+    
+    <string name="stat_group_agent">Agent</string>
+    <string name="stat_group_discovery">Discovery</string>
+    <string name="stat_group_building">Building</string>
+    <string name="stat_group_combat">Combat</string>
+    <string name="stat_group_health">Health</string>
+    <string name="stat_group_defense">Defense</string>
+    
+    <string name="activity_share_ok">Ok</string>
+    
 </resources>

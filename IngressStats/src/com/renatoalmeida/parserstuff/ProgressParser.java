@@ -1,6 +1,7 @@
 package com.renatoalmeida.parserstuff;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import com.renatoalmeida.db.StatsResources;
 
@@ -15,15 +16,36 @@ public class ProgressParser {
 		statValue = new HashMap<String, Integer>();
 		
 		for(String line : text.split("\\r?\\n")){
-			Log.d("cenas", line);
-			for(String stat : StatsResources.statsString.keySet()){
+			String tmpLine = line.replace(" ", "");
+			
+			for(int statIndex = 0; statIndex < StatsResources.stats.size(); statIndex++){
 				
-				String tmpLine = line.replace(" ", "");
-				String tmpStat = StatsResources.statsString.get(stat).replace(" ", "");
+				String stat = StatsResources.stats.get(statIndex);
 				
-				if(tmpLine.startsWith(tmpStat)){
-					statValue.put(stat, Integer.parseInt(line.replaceAll("[^\\d.]", "")));
+				if (stat == "AP")
+					continue;
+				String tmpStat = stat;
+				
+				if(tmpLine.toLowerCase().startsWith(tmpStat.toLowerCase())){
+					int val = 0;
+					try{
+						val = Integer.parseInt(line.replaceAll("[^\\d.]", ""));
+					}
+					catch(Exception e){}
+					
+					statValue.put(stat, val);
 				}
+			}
+			if(line.toLowerCase(Locale.getDefault()).contains("ap")){
+				String tmpString[] = line.toLowerCase(Locale.getDefault()).split("ap");
+				
+				int val = 0;
+				try{
+					val = Integer.parseInt(tmpString[0].replaceAll("[^\\d.]", ""));
+
+					statValue.put("AP", val);
+				}
+				catch(Exception e){}
 			}
 		}
 	}

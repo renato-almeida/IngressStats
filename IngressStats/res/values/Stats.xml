@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="stats">
+        <item>AP</item>
+        
+        <item>UniquePortalsVisited</item>
+        <item>PortalsDiscovered</item>
+        <item>XMCollected</item>
+        
+        <item>Hacks</item>
+        <item>ResonatorsDeployed</item>
+        <item>LinksCreated</item>
+        <item>ControlFieldsCreated</item>
+        <item>MindUnitsCaptured</item>
+        <item>LongestLinkEverCreated</item>
+        <item>LargestControlField</item>
+        <item>XMRecharged</item>
+        <item>PortalsCaptured</item>
+        <item>UniquePortalsCaptured</item>
+        
+        <item>ResonatorsDestroyed</item>
+        <item>PortalsNeutralized</item>
+        <item>EnemyLinksDestroyed</item>
+        <item>EnemyControlFieldsDestroyed</item>
+        
+        <item>DistanceWalked</item>
+        
+        <item>MaxTimePortalHeld</item>
+        <item>MaxTimeLinkMaintained</item>
+        <item>MaxLinkLengthxDays</item>
+        <item>MaxTimeFieldHeld</item>
+        <item>LargestFieldMUsxDays</item>
+    </string-array>
+    
+    <integer-array name="discovery_agent">
+        <item>0</item>
+        <item>0</item>
+    </integer-array>
+    
+    <integer-array name="discovery_group">
+        <item>1</item>
+        <item>3</item>
+    </integer-array>
+    
+    <integer-array name="building_group">
+        <item>4</item>
+        <item>13</item>
+    </integer-array>
+    
+    <integer-array name="combat_group">
+        <item>14</item>
+        <item>17</item>
+    </integer-array>
+    
+    <integer-array name="health_group">
+        <item>18</item>
+        <item>18</item>
+    </integer-array>
+    
+    <integer-array name="defense_group">
+        <item>19</item>
+        <item>23</item>
+    </integer-array>
+    
+    <array name="group_list">
+        <item>@array/discovery_agent</item>
+        <item>@array/discovery_group</item>
+        <item>@array/building_group</item>
+        <item>@array/combat_group</item>
+        <item>@array/health_group</item>
+        <item>@array/defense_group</item>
+    </array>
+    
+    <array name="group_name_list">
+        <item>@string/stat_group_agent</item>
+        <item>@string/stat_group_discovery</item>
+        <item>@string/stat_group_building</item>
+        <item>@string/stat_group_combat</item>
+        <item>@string/stat_group_health</item>
+        <item>@string/stat_group_defense</item>
+    </array>
+    
+</resources>
