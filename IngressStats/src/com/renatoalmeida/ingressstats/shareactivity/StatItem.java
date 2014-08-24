@@ -3,9 +3,9 @@ package com.renatoalmeida.ingressstats.shareactivity;
 public class StatItem implements Item {
 	
 	private final String stat;
-	private final int value;
+	private final long value;
 
-	public StatItem(String stat, int value) {
+	public StatItem(String stat, long value) {
 		this.stat = stat;
 		this.value = value;
 	}
@@ -14,7 +14,7 @@ public class StatItem implements Item {
 		return stat;
 	}
 
-	public int getValue() {
+	public long getValue() {
 		return value;
 	}
 

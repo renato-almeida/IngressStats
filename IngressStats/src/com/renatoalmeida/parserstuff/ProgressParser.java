@@ -3,31 +3,33 @@ package com.renatoalmeida.parserstuff;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.renatoalmeida.db.StatsResources;
+import android.content.Context;
 
-import android.util.Log;
-import android.util.SparseArray;
+import com.renatoalmeida.ingressstats.R;
 
 public class ProgressParser {
 	
-	public HashMap<String, Integer> statValue;
+	public HashMap<String, Long> statValue;
 	
-	public ProgressParser(String text){
-		statValue = new HashMap<String, Integer>();
+	public ProgressParser(Context context, String text){
+		
+		statValue = new HashMap<String, Long>();
+		
+		String[] stats = context.getResources().getStringArray(R.array.stats);
 		
 		for(String line : text.split("\\r?\\n")){
 			String tmpLine = line.replace(" ", "");
 			
-			for(int statIndex = 0; statIndex < StatsResources.stats.size(); statIndex++){
+			for(int statIndex = 0; statIndex < stats.length; statIndex++){
 				
-				String stat = StatsResources.stats.get(statIndex);
+				String stat = stats[statIndex];
 				
 				if (stat == "AP")
 					continue;
 				String tmpStat = stat;
 				
 				if(tmpLine.toLowerCase().startsWith(tmpStat.toLowerCase())){
-					int val = 0;
+					long val = 0;
 					try{
 						val = Integer.parseInt(line.replaceAll("[^\\d.]", ""));
 					}
@@ -36,10 +38,11 @@ public class ProgressParser {
 					statValue.put(stat, val);
 				}
 			}
+			
 			if(line.toLowerCase(Locale.getDefault()).contains("ap")){
 				String tmpString[] = line.toLowerCase(Locale.getDefault()).split("ap");
 				
-				int val = 0;
+				long val = 0;
 				try{
 					val = Integer.parseInt(tmpString[0].replaceAll("[^\\d.]", ""));
 

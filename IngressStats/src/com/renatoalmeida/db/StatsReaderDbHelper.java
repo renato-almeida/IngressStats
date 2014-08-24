@@ -1,31 +1,42 @@
 package com.renatoalmeida.db;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.renatoalmeida.db.StatsContract.StatsEntry;
+import com.renatoalmeida.ingressstats.R;
 
 public class StatsReaderDbHelper extends SQLiteOpenHelper {
 
 	// If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "IngressStats.db";
 
     private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
     
-    private static String SQL_CREATE_ENTRIES =
-        "CREATE TABLE " + StatsEntry.TABLE_NAME + " (" +
-        		StatsEntry._ID + INT_TYPE + " KEY," +
-        		StatsEntry.COLUMN_NAME_STATS_ID + INT_TYPE + COMMA_SEP;
+    public static final String TABLE_NAME = "IngressStats";
+
     
-    static {
-    	
-    	for(int i = 0; i<StatsResources.stats.size(); i++){
-    		
-    		SQL_CREATE_ENTRIES += StatsResources.stats.get(i) + INT_TYPE + COMMA_SEP;
+    private String SQL_CREATE_ENTRIES =
+        "CREATE TABLE " + TABLE_NAME + " (";
+        		
+    
+    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    
+    public StatsReaderDbHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        
+        String[] stats = context.getResources().getStringArray(R.array.stats);
+        
+        //add the rest of the columns
+        for(int i = 0; i< stats.length; i++){
+    		SQL_CREATE_ENTRIES += stats[i] + INT_TYPE + COMMA_SEP;
     	}
     	
     	//Remove last comma
@@ -34,31 +45,52 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
     	SQL_CREATE_ENTRIES += " )";
     }
     
-    public StatsReaderDbHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
     }
+    
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //Do nothing, because it would delete the entries
+    	db.execSQL(SQL_DELETE_ENTRIES);
+        onCreate(db);
     }
+    
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
     
-    public Cursor getLastEntry(){
+    public void addEntry(HashMap<String, Long> values){
+    	SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues cValues = new ContentValues();
+		
+		for (Entry<String, Long> item : values.entrySet()) {
+			cValues.put(item.getKey(), item.getValue());
+		}
+		
+		db.insert(StatsReaderDbHelper.TABLE_NAME, null, cValues);
+    }
+    
+    public HashMap<String, Long> getLastEntry(){
     	SQLiteDatabase db = this.getReadableDatabase();
-
+    	HashMap<String, Long> values = null;
+    	
     	Cursor c = db.query(
-    			StatsEntry.TABLE_NAME,  
+    			TABLE_NAME,  
     		    null,                               // The columns to return
     		    null,                                // The columns for the WHERE clause
     		    null,                            
     		    null,                                     
     		    null,                                     
-    		    StatsEntry.COLUMN_NAME_STATS_ID + " DESC"                                 
+    		    "Timestamp DESC"                                 
     		    );
-    	return c;
+    	
+    	if(c.moveToFirst()){
+    		values = new HashMap<String, Long>();
+    		
+    		for(int i = 0; i < c.getColumnCount(); i++){
+    			values.put(c.getColumnName(i), c.getLong(i));
+    		}
+    	}
+    	
+    	return values;
     }
 }

@@ -1,24 +1,18 @@
 package com.renatoalmeida.ingressstats;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import com.renatoalmeida.db.StatsReaderDbHelper;
-import com.renatoalmeida.db.StatsContract.StatsEntry;
-import com.renatoalmeida.db.StatsResources;
-import com.renatoalmeida.ingressstats.badges.BadgeList;
-import com.renatoalmeida.ingressstats.badges.BadgeRequirement;
-import com.renatoalmeida.ingressstats.badges.IBadge;
-import com.renatoalmeida.ingressstats.shareactivity.ShareActivity;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.renatoalmeida.db.StatsReaderDbHelper;
+import com.renatoalmeida.ingressstats.badges.BadgeList;
 
 public class MainActivity extends Activity {
 
@@ -31,28 +25,27 @@ public class MainActivity extends Activity {
 		
 		StatsReaderDbHelper db = new StatsReaderDbHelper(this);
 		
-		Cursor c = db.getLastEntry();
-		c.moveToFirst();
+		HashMap<String, Long> values = db.getLastEntry();
 		
-		if(c.getCount() == 0)
+		if(values == null)
 			return;
 		
 		
 		List<String> statWithBadge = new ArrayList<String>();
 		
-		for(int i=0; i<StatsResources.stats.size(); i++ ){
-			String stat = StatsResources.stats.get(i);
+		String[] stats = getResources().getStringArray(R.array.stats);
+		
+		for(int i=0; i< stats.length; i++ ){
+			String stat = stats[i];
 			
 			if(BadgeList.List.get(stat) != null)
 				statWithBadge.add(stat);
 		}
 		
-		BadgeAdapter ba = new BadgeAdapter(this, statWithBadge, c);
+		BadgeAdapter ba = new BadgeAdapter(this, statWithBadge, values);
 		lv.setAdapter(ba);
 		
 		TextView tv = (TextView) findViewById(R.id.ap);
-		Log.d("cenas", "pos: "+c.getColumnIndex("AP"));
-		tv.setText("AP :" + c.getLong(c.getColumnIndex("AP")));
-		
+		tv.setText("AP :" + values.get("AP"));
 	}
 }

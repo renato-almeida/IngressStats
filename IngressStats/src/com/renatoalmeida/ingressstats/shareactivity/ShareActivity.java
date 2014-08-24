@@ -6,27 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
-import com.renatoalmeida.db.StatsContract.StatsEntry;
-import com.renatoalmeida.db.StatsReaderDbHelper;
-import com.renatoalmeida.ingressstats.MainActivity;
-import com.renatoalmeida.ingressstats.R;
-import com.renatoalmeida.ingressstats.R.id;
-import com.renatoalmeida.parserstuff.ProgressParser;
-
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,16 +24,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import com.googlecode.tesseract.android.TessBaseAPI;
+import com.renatoalmeida.db.StatsReaderDbHelper;
+import com.renatoalmeida.ingressstats.MainActivity;
+import com.renatoalmeida.ingressstats.R;
+import com.renatoalmeida.parserstuff.ProgressParser;
 
 public class ShareActivity extends ListActivity {
 
-	public static final String DATA_PATH = Environment
-			.getExternalStorageDirectory().toString() + "/IngressStats/";
+	public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/IngressStats/";
 	public static final String lang = "eng";
 	private static final String TAG = "IngressStats.java";
 
@@ -131,30 +118,30 @@ public class ShareActivity extends ListActivity {
 				Log.v(TAG, "Copied " + lang + " traineddata");
 			} catch (IOException e) {
 				Log.e(TAG,
-						"Was unable to copy " + lang + " traineddata "
-								+ e.toString());
+						"Was unable to copy " + lang + " traineddata " + e.toString());
 			}
 		}
 	}
 
-	private class StatsParserTask extends AsyncTask<Intent, String, HashMap<String, Integer>> {
+	private class StatsParserTask extends AsyncTask<Intent, String, HashMap<String, Long>> {
 		private ProgressDialog progDailog;
 
 		@Override
-		protected HashMap<String, Integer> doInBackground(Intent... intents) {
+		protected HashMap<String, Long> doInBackground(Intent... intents) {
 			publishProgress("Starting...");
 			ShareActivity.this.setOCRStuff();
 
-			HashMap<String, Integer> ret = null;
+			HashMap<String, Long> ret = null;
 
 			Intent intent = getIntent();
 			publishProgress("Getting the imagem...");
 			if (intent.getType().indexOf("image/") != -1) {
-				Uri imageUri = (Uri) intent
-						.getParcelableExtra(Intent.EXTRA_STREAM);
+				Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+				
 				if (imageUri != null) {
 					Bitmap image = getImage(imageUri);
-
+					long modifiedDate = getLastModificationDate(imageUri);
+					
 					publishProgress("Parsing ...");
 
 					TessBaseAPI baseApi = new TessBaseAPI();
@@ -168,30 +155,38 @@ public class ShareActivity extends ListActivity {
 
 					publishProgress("Parse done, starting text parse ...");
 
-					ProgressParser pp = new ProgressParser(recognizedText);
-
+					ProgressParser pp = new ProgressParser(getApplicationContext(), recognizedText);
+					pp.statValue.put("Timestamp",	modifiedDate);
+					
 					publishProgress("Storing values in database...");
 
 					StatsReaderDbHelper mDbHelper = new StatsReaderDbHelper(ShareActivity.this);
-					SQLiteDatabase db = mDbHelper.getWritableDatabase();
-					ContentValues values = new ContentValues();
+					mDbHelper.addEntry(pp.statValue);
 
-					values.put(StatsEntry.COLUMN_NAME_STATS_ID,	System.currentTimeMillis() / 1000L);
-
-					for (Entry<String, Integer> item : pp.statValue.entrySet()) {
-						values.put(item.getKey(), item.getValue());
-					}
-
-					db.insert(StatsEntry.TABLE_NAME, null, values);
-
-					publishProgress("All went well...");
 					ret = pp.statValue;
+					
+					publishProgress("All went well...");
 				} else {
 					Log.d("cenas", "nullllll");
 				}
 			}
 
 			return ret;
+		}
+		
+		private long getLastModificationDate(Uri uri) {
+		    Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+		    if(cursor == null)
+		    	return System.currentTimeMillis() / 1000L;
+		    
+		    cursor.moveToFirst(); 
+		    int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+		    
+			File f = new File(cursor.getString(idx));
+			if(f.exists())
+				return f.lastModified();
+			else
+				return System.currentTimeMillis() / 1000L;
 		}
 
 		@Override
@@ -210,11 +205,11 @@ public class ShareActivity extends ListActivity {
 		}
 
 		@Override
-		protected void onPostExecute(HashMap<String, Integer> result) {
+		protected void onPostExecute(HashMap<String, Long> result) {
 			progDailog.dismiss();
-
+			
 			ShareActivityAdapter adapter = new ShareActivityAdapter(getApplicationContext(), result);
-
+			
 			setListAdapter(adapter);
 		}
 	}
