@@ -2,6 +2,8 @@
 <resources>
     <string-array name="stats">
         <item>AP</item>
+        <item>Level</item>
+        <item>Timestamp</item>
         
         <item>UniquePortalsVisited</item>
         <item>PortalsDiscovered</item>
@@ -32,38 +34,38 @@
         <item>LargestFieldMUsxDays</item>
     </string-array>
     
-    <integer-array name="discovery_agent">
+    <integer-array name="agent_group">
         <item>0</item>
-        <item>0</item>
+        <item>2</item>
     </integer-array>
     
     <integer-array name="discovery_group">
-        <item>1</item>
         <item>3</item>
+        <item>5</item>
     </integer-array>
     
     <integer-array name="building_group">
-        <item>4</item>
-        <item>13</item>
+        <item>6</item>
+        <item>15</item>
     </integer-array>
     
     <integer-array name="combat_group">
-        <item>14</item>
-        <item>17</item>
+        <item>16</item>
+        <item>19</item>
     </integer-array>
     
     <integer-array name="health_group">
-        <item>18</item>
-        <item>18</item>
+        <item>20</item>
+        <item>20</item>
     </integer-array>
     
     <integer-array name="defense_group">
-        <item>19</item>
-        <item>23</item>
+        <item>21</item>
+        <item>25</item>
     </integer-array>
     
     <array name="group_list">
-        <item>@array/discovery_agent</item>
+        <item>@array/agent_group</item>
         <item>@array/discovery_group</item>
         <item>@array/building_group</item>
         <item>@array/combat_group</item>
