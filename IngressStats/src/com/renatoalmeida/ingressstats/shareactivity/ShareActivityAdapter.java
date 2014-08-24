@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +28,12 @@ public class ShareActivityAdapter extends BaseAdapter{
 
 	private LayoutInflater mInflater;
 	private Context mContext;
+	
+	private HashMap<String, Long> previousValues;
  
-	public ShareActivityAdapter(Context context, HashMap<String, Long> stats) {
+	public ShareActivityAdapter(Context context, HashMap<String, Long> stats, HashMap<String, Long> previousValues) {
 		mContext = context;
+		this.previousValues = previousValues;
 		
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
@@ -106,9 +110,21 @@ public class ShareActivityAdapter extends BaseAdapter{
 
 				nameTv.setText(sItem.getStat());
 				
-				if(!sItem.getStat().equals("Timestamp"))
-					valueTv.setText(sItem.getValue()+"");
-				else{
+				if(!sItem.getStat().equals("Timestamp")){
+					String value = sItem.getValue()+"";
+					
+					if(previousValues != null){
+						Long previousValue = previousValues.get(sItem.getStat());
+						if(previousValue != null){
+							long diff = sItem.getValue() - previousValue;
+							value += "  (" + (diff>=0?"+":"-") + diff + ")";
+							
+							Log.d("cenas", sItem.getStat() +": "+sItem.getValue() + " ---- "+previousValue);
+						}
+					}
+					
+					valueTv.setText(value);
+				}else{
 					Date date = new Date(sItem.getValue()*1000);
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(date);

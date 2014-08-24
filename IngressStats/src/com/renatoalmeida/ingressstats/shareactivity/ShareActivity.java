@@ -207,9 +207,11 @@ public class ShareActivity extends ListActivity {
 		@Override
 		protected void onPostExecute(HashMap<String, Long> result) {
 			progDailog.dismiss();
+
+			StatsReaderDbHelper mDbHelper = new StatsReaderDbHelper(ShareActivity.this);
+			HashMap<String, Long> previousValues = mDbHelper.getSecondEntry();
 			
-			ShareActivityAdapter adapter = new ShareActivityAdapter(getApplicationContext(), result);
-			
+			ShareActivityAdapter adapter = new ShareActivityAdapter(getApplicationContext(), result, previousValues);
 			setListAdapter(adapter);
 		}
 	}

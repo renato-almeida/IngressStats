@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
 		
 		StatsReaderDbHelper db = new StatsReaderDbHelper(this);
 		
-		HashMap<String, Long> values = db.getLastEntry();
+		HashMap<String, Long> values = db.getFirstEntry();
 		
 		if(values == null)
 			return;

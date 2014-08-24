@@ -13,8 +13,7 @@ import com.renatoalmeida.ingressstats.R;
 
 public class StatsReaderDbHelper extends SQLiteOpenHelper {
 
-	// If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "IngressStats.db";
 
     private static final String INT_TYPE = " INTEGER";
@@ -24,7 +23,8 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
 
     
     private String SQL_CREATE_ENTRIES =
-        "CREATE TABLE " + TABLE_NAME + " (";
+        "CREATE TABLE " + TABLE_NAME + " ("+
+        		"StatID INTEGER PRIMARY KEY AUTOINCREMENT, ";
         		
     
     private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -66,10 +66,11 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
 			cValues.put(item.getKey(), item.getValue());
 		}
 		
-		db.insert(StatsReaderDbHelper.TABLE_NAME, null, cValues);
+		db.insert(TABLE_NAME, null, cValues);
+		db.close();
     }
     
-    public HashMap<String, Long> getLastEntry(){
+    public HashMap<String, Long> getFirstEntry(){
     	SQLiteDatabase db = this.getReadableDatabase();
     	HashMap<String, Long> values = null;
     	
@@ -80,17 +81,42 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
     		    null,                            
     		    null,                                     
     		    null,                                     
-    		    "Timestamp DESC"                                 
+    		    "StatID DESC"                                 
     		    );
     	
     	if(c.moveToFirst()){
     		values = new HashMap<String, Long>();
-    		
     		for(int i = 0; i < c.getColumnCount(); i++){
     			values.put(c.getColumnName(i), c.getLong(i));
     		}
     	}
     	
+    	db.close();
+    	return values;
+    }
+    
+    public HashMap<String, Long> getSecondEntry(){
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	HashMap<String, Long> values = null;
+    	
+    	Cursor c = db.query(
+    			TABLE_NAME,  
+    		    null,                               // The columns to return
+    		    null,                                // The columns for the WHERE clause
+    		    null,                            
+    		    null,                                     
+    		    null,                                     
+    		    "StatID DESC"                                 
+    		    );
+    	
+    	if(c.moveToFirst() && c.moveToNext()){
+    		values = new HashMap<String, Long>();
+    		for(int i = 0; i < c.getColumnCount(); i++){
+    			values.put(c.getColumnName(i), c.getLong(i));
+    		}
+    	}
+    	
+    	db.close();
     	return values;
     }
 }
