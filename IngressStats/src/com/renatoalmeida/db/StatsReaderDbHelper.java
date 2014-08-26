@@ -94,7 +94,7 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
     	db.close();
     	return values;
     }
-    
+
     public HashMap<String, Long> getSecondEntry(){
     	SQLiteDatabase db = this.getReadableDatabase();
     	HashMap<String, Long> values = null;
@@ -110,6 +110,32 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
     		    );
     	
     	if(c.moveToFirst() && c.moveToNext()){
+    		values = new HashMap<String, Long>();
+    		for(int i = 0; i < c.getColumnCount(); i++){
+    			values.put(c.getColumnName(i), c.getLong(i));
+    		}
+    	}
+    	
+    	db.close();
+    	return values;
+    }
+    
+
+    public HashMap<String, Long> getAllEntries(){
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	HashMap<String, Long> values = null;
+    	
+    	Cursor c = db.query(
+    			TABLE_NAME,  
+    		    null,                               // The columns to return
+    		    null,                                // The columns for the WHERE clause
+    		    null,                            
+    		    null,                                     
+    		    null,                                     
+    		    "StatID DESC"                                 
+    		    );
+    	
+    	while(c.moveToFirst()){
     		values = new HashMap<String, Long>();
     		for(int i = 0; i < c.getColumnCount(); i++){
     			values.put(c.getColumnName(i), c.getLong(i));
