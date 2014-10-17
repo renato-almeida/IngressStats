@@ -1,9 +1,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}" >
 
+    <Spinner 
+        android:id="@+id/history_fragment_picker"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:padding="10dp"
+	    />
+    <ListView 
+        android:id="@+id/history_fragment_list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="match_parent">
+        
+    </ListView>
     
 </LinearLayout>

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.renatoalmeida.ingressstats.R;
 
@@ -123,19 +124,69 @@ public class StatsReaderDbHelper extends SQLiteOpenHelper {
 
     public HashMap<String, Long> getAllEntries(){
     	SQLiteDatabase db = this.getReadableDatabase();
-    	HashMap<String, Long> values = null;
+    	HashMap<String, Long> values = new HashMap<String, Long>();
     	
     	Cursor c = db.query(
     			TABLE_NAME,  
-    		    null,                               // The columns to return
-    		    null,                                // The columns for the WHERE clause
+    		    null,                               
+    		    null,                               
     		    null,                            
     		    null,                                     
     		    null,                                     
     		    "StatID DESC"                                 
     		    );
     	
-    	while(c.moveToFirst()){
+    	if(c.moveToFirst()){
+    		do{
+	    		for(int i = 0; i < c.getColumnCount(); i++){
+	    			values.put(c.getColumnName(i), c.getLong(i));
+	    		}
+    		}while(c.moveToNext());
+    	}
+    	
+    	db.close();
+    	return values;
+    }
+    
+    public String[] getAllTimestamps(){
+    	String[] list = null;
+    	SQLiteDatabase db = this.getReadableDatabase();
+
+    	Cursor c = db.query(
+    			TABLE_NAME,  
+    		    null,                               
+    		    null,                               
+    		    null,                            
+    		    null,                                     
+    		    null,                                     
+    		    "StatID DESC"                                 
+    		    );
+    	if(c.moveToFirst()){
+    		list = new String[c.getCount()];
+	    	for(int i = 0; !c.isAfterLast() ; i++, c.moveToNext()){
+	    		list[i] = ""+c.getLong(c.getColumnIndex("Timestamp"));
+	    	}
+    	}
+    	
+    	db.close();
+    	return list;
+    }
+    
+    public HashMap<String, Long> getRecordEntry(String timestamp){
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	HashMap<String, Long> values = null;
+    	
+    	Cursor c = db.query(
+    			TABLE_NAME,  
+    		    null,
+    		    "Timestamp = ?",                                
+    		    new String[] {timestamp},                            
+    		    null,                                     
+    		    null,                                     
+    		    "StatID DESC"                                 
+    		    );
+    	
+    	if(c.moveToFirst()){
     		values = new HashMap<String, Long>();
     		for(int i = 0; i < c.getColumnCount(); i++){
     			values.put(c.getColumnName(i), c.getLong(i));
